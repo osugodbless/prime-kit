@@ -134,7 +134,7 @@ def show_history() -> None:
         elif etype == "list_primes":
             print(f"  Primes up to {entry['limit']}: {entry['count']} primes found")
         elif etype == "factorise":
-            parts = " x ".join([f"{p}^{e}" if e > 1 else f"{p}" for p, e in entry["factors"]])
+            parts = " x ".join([f"{factor['prime']}^{factor['exponent']}" if factor['exponent'] > 1 else f"{factor['prime']}" for factor in entry["factors"]])
             print(f"  {entry['number']} = {parts}")
 
 

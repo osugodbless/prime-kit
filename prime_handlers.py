@@ -16,7 +16,7 @@ def handle_check_prime() -> None:
         return
 
     if num < 2:
-        print(f"{num} is invalid. Prime numbers must be greater than or equal to 2.")
+        print(f"{num} is NOT a prime number. Prime numbers must be greater than or equal to 2.")
     elif is_prime(num):
         print(f"{num} is a prime number.")
     else:

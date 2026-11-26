@@ -1,13 +1,22 @@
 # Prime Kit
 
-Prime Kit is a small command line program that answers two questions:
+Prime Kit is a small command line program for working with prime numbers.
 
-1. Is this number prime?
-2. Which prime numbers are there up to this number?
+## What this program does
+
+You can:
+
+1. **Check if a number is prime** - Determines if a given number is prime
+2. **List primes up to N** - Lists all prime numbers up to a given limit
+3. **Prime factorisation** - Shows the prime factorisation of a number (e.g., `360 = 2^3 x 3^2 x 5`)
+4. **Self-test** - Runs a self-test checking `is_prime` and `prime_factorisation` against known lists of primes and composites, and reports any disagreement
+5. **Show history** - Displays a history of all prime checks, factorisations, and prime lists made in the current and previous sessions; data is saved between sessions in `.prime_history.json`
+6. **Clear history** - Clears the saved history file
+7. **Prime Quiz** - A game where you pick the prime number from four options; scores based on speed and accuracy; top 5 scores are saved to `.prime_quiz_scores.json`
 
 A prime number is a whole number greater than 1 that can only be divided evenly by 1 and by itself. Examples: 2, 3, 5, 7, 11, 13.
 
-The program runs in a terminal. It asks you to choose an option, then asks for a number, then prints the answer. It does not need the internet, does not save anything, and does not need any extra packages.
+The program runs in a terminal. It does not need the internet. It saves data between sessions using JSON files in the project directory.
 
 ## What is in this project
 
@@ -44,11 +53,15 @@ You will see:
 === Prime Number Checker ===
 1. Check if a number is prime
 2. List primes up to N
-3. Exit
-Choose an option:
+3. Prime factorisation
+4. Self-test
+5. Show history
+6. Clear history
+7. Prime Quiz
+8. Exit
 ```
 
-Type `1`, `2`, or `3` and press Enter.
+Type `1`-`8` and press Enter.
 
 ### Example 1: check one number
 
@@ -71,10 +84,18 @@ If the number is less than 2:
 ```text
 Choose an option: 1
 Enter a whole number: 1
-1 is invalid. Prime numbers must be greater than or equal to 2.
+1 is NOT a prime number. Prime numbers must be greater than or equal to 2.
 ```
 
-### Example 2: list primes up to a number
+### Example 2: prime factorisation
+
+```text
+Choose an option: 3
+Enter a whole number: 360
+360 = 2^3 x 3^2 x 5
+```
+
+### Example 3: list primes up to a number
 
 ```text
 Choose an option: 2
@@ -94,17 +115,65 @@ None
 Count: 0
 ```
 
-### Example 3: leave the program
+### Example 4: self-test
 
 ```text
-Choose an option: 3
-Goodbye!
+Choose an option: 4
+Running self-test...
+=== Self-Test: is_prime ===
+
+=== Self-Test: prime_factorisation ===
+  OK: 2 = 2
+  OK: 3 = 3
+  OK: 4 = 2^2
+  OK: 6 = 2 x 3
+  OK: 12 = 2^2 x 3
+  OK: 360 = 2^3 x 3^2 x 5
+  OK: 49 = 7^2
+  OK: 97 = 97
+  OK: 100 = 2^2 x 5^2
+
+All tests passed!
+Self-test: ALL CHECKS PASSED
 ```
 
-If you type anything other than `1`, `2`, or `3`, the program says:
+### Example 5: show history
+
+After running checks, option 5 shows:
 
 ```text
-Invalid option. Please choose 1, 2, or 3.
+=== Prime Check History ===
+  17 is prime
+  360 = 2^3 x 3^2 x 5
+  Primes up to 10: 4 primes found
+```
+
+### Example 6: Prime Quiz
+
+```text
+Choose an option: 7
+=== Prime Quiz ===
+Pick the prime number from the four options.
+Score based on speed and accuracy.
+Top 5 scores are saved.
+
+Which number is prime?
+  1. 30
+  2. 8
+  3. 31
+  4. 45
+Your choice (1-4): Correct! You earned 9 points (took 1.0s)
+
+=== Top 5 Scores ===
+  1. Score: 9 (time: 1.0s)
+
+Play again? (y/n): n
+```
+
+If you type anything other than `1`-`8`, the program says:
+
+```text
+Invalid option. Please choose 1, 2, 3, 4, 5, 6, 7, or 8.
 ```
 
 If you type something that is not a whole number where a number is asked for, the program says:
@@ -113,28 +182,26 @@ If you type something that is not a whole number where a number is asked for, th
 Invalid input. Please enter a whole number (e.g., 7, 17).
 ```
 
-It then shows the menu again. A bad answer never stops the program.
-
 ## How the program works
 
 Here is the path a request takes:
 
 ```text
 You type a choice
-      |
-      v
+       |
+       v
 main.py shows the menu and reads your choice
-      |
-      v
+       |
+       v
 prime_handlers.py asks for the number and checks it is a whole number
-      |
-      v
+       |
+       v
 prime.py does the prime number work
-      |
-      v
+       |
+       v
 prime_handlers.py prints the answer
-      |
-      v
+       |
+       v
 main.py shows the menu again
 ```
 
@@ -152,7 +219,7 @@ Why this was chosen:
 - If you later want to change how primes are found, you only change `prime.py`.
 - A mistake in the menu cannot break the prime math, and a mistake in the prime math cannot break the menu.
 
-This is why `main.py` calls two small functions in `prime_handlers.py`: `handle_check_prime()` and `handle_list_primes()`. It does not call the prime functions directly.
+This is why `main.py` calls small functions in `prime_handlers.py`: `handle_check_prime()`, `handle_list_primes()`, `handle_factorise()`, `handle_self_test()`, `show_history()`, `clear_history()`, and `handle_prime_quiz()`. It does not call the prime functions directly.
 
 ### 2. Put the "ask and print" work in its own file
 
@@ -206,6 +273,7 @@ Why not just call `is_prime()` for every number? That would work, but the sieve 
 - `is_prime(num)` gives back `True` or `False`.
 - `prime_sieve(max_n)` gives back a list of `True` and `False` flags, one for each number from 0 to max_n.
 - `primes_up_to(limit)` gives back the list of primes, for example `[2, 3, 5, 7]` for 10.
+- `prime_factorisation(n)` gives back a list of `(prime, exponent)` tuples, for example `[(2, 3), (3, 2), (5, 1)]` for 360.
 
 Why this was chosen:
 
@@ -216,7 +284,7 @@ Why this was chosen:
 
 The program checks input at the point where it is read, in `prime_handlers.py`.
 
-- A menu choice that is not `1`, `2`, or `3` is rejected in `main.py`, because that is where the menu lives.
+- A menu choice that is not `1`-`8` is rejected in `main.py`, because that is where the menu lives.
 - A number that is not a whole number is rejected in `prompt_int()`.
 - A number below 2 is rejected only for the "check one number" option, because primes must be at least 2.
 - For the "list primes" option, a number below 2 is allowed and gives an empty result: `None` and `Count: 0`.
@@ -228,29 +296,31 @@ Why this was chosen:
 
 ### 6. Keep the menu running after a mistake
 
-`main.py` uses a `while True` loop. That means "keep doing this until we are told to stop". The only way out is choosing `3`.
+`main.py` uses a `while True` loop. That means "keep doing this until we are told to stop". The only way out is choosing `8`.
 
 Why this was chosen:
 
 - A typo does not force you to restart the program.
-- The exit path is simple and visible: option 3 prints `Goodbye!` and ends the loop.
+- The exit path is simple and visible: option 8 prints `Goodbye!` and ends the loop.
 
-### 7. No extra packages, no saved data
+### 7. No extra packages, minimal saved data
 
-The project uses only Python itself.
+The project uses only Python itself standard library modules (`json`, `os`, `time`, `random`).
 
 Why this was chosen:
 
 - It runs anywhere Python 3.10 or newer is available.
 - There is no install step and no network access.
-- Every run starts fresh, so there is no saved state to get out of date.
+- Data is saved between sessions using JSON files (`.prime_history.json` and `.prime_quiz_scores.json`) in the project directory.
 
 ## Things to know
 
 - Only whole numbers are accepted. `7` is fine; `7.5` is not.
 - Very large numbers take longer and use more memory, especially in the "list primes" option. The sieve needs one entry for every number from 0 up to N.
-- There is no automated test file in this project at the moment. The examples above were checked by running the program directly.
-- `prime_sieve()` returns a list of `True`/`False` flags. If you call it with a negative number, it returns an empty list.
+- The self-test checks your algorithms against known lists - if any fail, it will report them.
+- The history is saved between sessions in `.prime_history.json` in the project directory.
+- The Prime Quiz top 5 scores are saved in `.prime_quiz_scores.json` in the project directory.
+- Very large numbers take longer, especially in the "list primes" option. The sieve needs one entry for every number from 0 up to N.
 
 ## Where to make changes
 
